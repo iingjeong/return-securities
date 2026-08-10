@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS general_customer;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 증권사 고객 마스터 (RIA customer와 동일 ci_hash 규칙)
+-- [SEED] data-generator가 채우는 테이블. 컬럼 추가/삭제 시 생성기 INSERT(컬럼목록+값)도 수정 후 재생성 필요 (seed.sql 직접 편집 금지).
 CREATE TABLE general_customer (
     general_customer_id BIGINT      NOT NULL AUTO_INCREMENT,
     ci_hash             VARCHAR(64) NOT NULL COMMENT 'HMAC-SHA256(정규화 주민번호, 공유 PEPPER). RIA/myData와 동일 값',
@@ -27,6 +28,7 @@ CREATE TABLE general_customer (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='증권사 고객';
 
 -- 일반계좌 (해외+국내 주식 보관)
+-- [SEED] data-generator가 채우는 테이블. 컬럼 추가/삭제 시 생성기 INSERT(컬럼목록+값)도 수정 후 재생성 필요 (seed.sql 직접 편집 금지).
 CREATE TABLE general_account (
     general_account_id  BIGINT      NOT NULL AUTO_INCREMENT COMMENT '증권사 시스템 자체 PK',
     general_customer_id BIGINT      NOT NULL COMMENT '증권사 고객',
@@ -39,6 +41,7 @@ CREATE TABLE general_account (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='일반계좌';
 
 -- 해외 종목 마스터(증권사측 복제)
+-- [SEED] data-generator가 채우는 테이블. 컬럼 추가/삭제 시 생성기 INSERT(컬럼목록+값)도 수정 후 재생성 필요 (seed.sql 직접 편집 금지).
 CREATE TABLE copy_foreign_product (
     foreign_product_id BIGINT       NOT NULL AUTO_INCREMENT,
     ticker             VARCHAR(20)  NOT NULL COMMENT '종목코드',
@@ -51,6 +54,7 @@ CREATE TABLE copy_foreign_product (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='해외 종목 마스터(복제)';
 
 -- 입고 대상 종목 (2025.12.23 기준 보유수량)
+-- [SEED] data-generator가 채우는 테이블. 컬럼 추가/삭제 시 생성기 INSERT(컬럼목록+값)도 수정 후 재생성 필요 (seed.sql 직접 편집 금지).
 CREATE TABLE registrable_stock (
     registrable_stock_id BIGINT        NOT NULL AUTO_INCREMENT,
     general_account_id   BIGINT        NOT NULL COMMENT '출처 일반계좌',
@@ -67,6 +71,7 @@ CREATE TABLE registrable_stock (
 
 -- 국내주식 매매 시뮬레이터 (RIA 계좌 국내투자를 증권사가 무작위 생성 → RIA가 ci_hash로 pull)
 -- 식별: general_customer_id(내부 PK). 외부 API는 ci_hash로 받고 경계에서 id로 변환
+-- [NO-SEED] 계산 데이터(서비스/골든 시나리오로 생성). 생성기 무관.
 CREATE TABLE domestic_trade (
     trade_id            BIGINT        NOT NULL AUTO_INCREMENT,
     general_customer_id BIGINT        NOT NULL COMMENT '거래 주체(사람). RIA는 ci_hash로 조회→내부 id 변환',
