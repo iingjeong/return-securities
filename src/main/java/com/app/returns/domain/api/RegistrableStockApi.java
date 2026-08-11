@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/registrable-stocks")
+@RequestMapping("/api/registrable-stocks")
 public class RegistrableStockApi {
 
     private final RegistrableStockService registrableStockService;
