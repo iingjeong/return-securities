@@ -48,7 +48,7 @@ class RegistrableStockApiTest {
                 .build();
         when(registrableStockService.findHeldQty(any())).thenReturn(response);
 
-        mockMvc.perform(get("/registrable-stocks")
+        mockMvc.perform(get("/api/registrable-stocks")
                         .accept(MediaType.APPLICATION_JSON)
                         .param("generalAccountId", "1")
                         .param("foreignProductId", "1"))
@@ -61,7 +61,7 @@ class RegistrableStockApiTest {
 
     @Test
     void getRegistrableStockRejectsMissingGeneralAccountId() throws Exception {
-        mockMvc.perform(get("/registrable-stocks")
+        mockMvc.perform(get("/api/registrable-stocks")
                         .accept(MediaType.APPLICATION_JSON)
                         .param("foreignProductId", "1"))
                 .andExpect(status().isBadRequest())
@@ -72,7 +72,7 @@ class RegistrableStockApiTest {
 
     @Test
     void getRegistrableStockRejectsMissingForeignProductId() throws Exception {
-        mockMvc.perform(get("/registrable-stocks")
+        mockMvc.perform(get("/api/registrable-stocks")
                         .accept(MediaType.APPLICATION_JSON)
                         .param("generalAccountId", "1"))
                 .andExpect(status().isBadRequest())
@@ -86,7 +86,7 @@ class RegistrableStockApiTest {
         when(registrableStockService.findHeldQty(any()))
                 .thenThrow(new RegistrableStockNotFoundException("등록가능 보유수량 조회 실패"));
 
-        mockMvc.perform(get("/registrable-stocks")
+        mockMvc.perform(get("/api/registrable-stocks")
                         .accept(MediaType.APPLICATION_JSON)
                         .param("generalAccountId", "1")
                         .param("foreignProductId", "1"))
