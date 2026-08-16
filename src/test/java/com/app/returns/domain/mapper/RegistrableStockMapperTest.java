@@ -224,6 +224,67 @@ class RegistrableStockMapperTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    @DisplayName("해지(CLOSED)된 일반계좌의 보유수량은 합산에서 제외한다")
+    void findHeldQtyExcludesClosedGeneralAccount() {
+        insertGeneralCustomer(1L, "hash-1");
+        insertGeneralAccount(1L, 1L, "ACTIVE");
+        insertGeneralAccount(2L, 1L, "CLOSED");
+        insertRegistrableStock(1L, 1L, BigDecimal.valueOf(60));
+        insertRegistrableStock(2L, 1L, BigDecimal.valueOf(40));
+
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("hash-1")
+                .foreignProductId(1L)
+                .build();
+
+        Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getHeldQty()).isEqualByComparingTo(BigDecimal.valueOf(60));
+    }
+
+    @Test
+    @DisplayName("보유 계좌가 전부 CLOSED면 결과가 없다")
+    void findHeldQtyReturnsEmptyWhenAllGeneralAccountsAreClosed() {
+        insertGeneralCustomer(1L, "hash-1");
+        insertGeneralAccount(1L, 1L, "CLOSED");
+        insertRegistrableStock(1L, 1L, BigDecimal.valueOf(60));
+
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("hash-1")
+                .foreignProductId(1L)
+                .build();
+
+        Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("lot 목록에서 CLOSED된 일반계좌의 lot은 제외한다")
+    void findLotsByCiHashAndProductExcludesClosedGeneralAccount() {
+        insertGeneralCustomer(1L, "hash-1");
+        insertGeneralAccount(1L, 1L, "ACTIVE");
+        insertGeneralAccount(2L, 1L, "CLOSED");
+        insertRegistrableStock(
+                1L, 1L, BigDecimal.valueOf(60), LocalDateTime.of(2026, 3, 10, 9, 0),
+                BigDecimal.valueOf(180));
+        insertRegistrableStock(
+                2L, 1L, BigDecimal.valueOf(40), LocalDateTime.of(2026, 1, 5, 9, 0),
+                BigDecimal.valueOf(150));
+
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("hash-1")
+                .foreignProductId(1L)
+                .build();
+
+        List<RegistrableStockDTO> result = registrableStockMapper.findLotsByCiHashAndProduct(request);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getGeneralAccountId()).isEqualTo(1L);
+    }
+
     private void resetSchema() throws SQLException {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
@@ -273,13 +334,17 @@ class RegistrableStockMapperTest {
     }
 
     private void insertGeneralAccount(Long generalAccountId, Long generalCustomerId) {
+        insertGeneralAccount(generalAccountId, generalCustomerId, "ACTIVE");
+    }
+
+    private void insertGeneralAccount(Long generalAccountId, Long generalCustomerId, String status) {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             statement.execute("""
                     INSERT INTO general_account
                     (general_account_id, general_customer_id, account_no, account_type, status)
-                    VALUES (%d, %d, '%010d', 'BROKERAGE', 'ACTIVE')
-                    """.formatted(generalAccountId, generalCustomerId, generalAccountId));
+                    VALUES (%d, %d, '%010d', 'BROKERAGE', '%s')
+                    """.formatted(generalAccountId, generalCustomerId, generalAccountId, status));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
