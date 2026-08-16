@@ -2,23 +2,60 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.app.returns.domain.mapper.RegistrableStockMapper">
 
-    <select id="findHeldQty"
+    <select id="findHeldQty" parameterType="RegistrableStockRequestDTO" resultType="RegistrableStockDTO">
+        <!-- 고객(ciHash)이 일반계좌 여러 개에 나눠 보유 중일 수 있어 heldQty는 합산.
+             출처 필드(generalAccountId 등)는 가장 이른 매수일 lot 기준 대표값 -->
+        SELECT
+        rs.registrable_stock_id AS registrableStockId,
+        rs.general_account_id AS generalAccountId,
+        ga.account_type AS accountType,
+        rs.foreign_product_id AS foreignProductId,
+        (SELECT COALESCE(SUM(rs2.held_qty), 0)
+        FROM registrable_stock rs2
+        JOIN general_account ga2 ON rs2.general_account_id = ga2.general_account_id
+        JOIN general_customer gc2 ON ga2.general_customer_id = gc2.general_customer_id
+        WHERE gc2.ci_hash = #{ciHash}
+        AND ga2.status = 'ACTIVE'
+        AND rs2.foreign_product_id = #{foreignProductId}) AS heldQty,
+        rs.source_broker AS sourceBroker,
+        rs.recorded_at AS recordedAt,
+        rs.purchase_date AS purchaseDate,
+        rs.purchase_price AS purchasePrice,
+        rs.purchase_currency AS purchaseCurrency,
+        rs.purchase_fx_rate AS purchaseFxRate
+        FROM registrable_stock rs
+        JOIN general_account ga ON rs.general_account_id = ga.general_account_id
+        JOIN general_customer gc ON ga.general_customer_id = gc.general_customer_id
+        WHERE gc.ci_hash = #{ciHash}
+        AND ga.status = 'ACTIVE'
+        AND rs.foreign_product_id = #{foreignProductId}
+        ORDER BY rs.purchase_date ASC
+        LIMIT 1
+    </select>
+
+    <select id="findLotsByCiHashAndProduct"
             parameterType="RegistrableStockRequestDTO"
             resultType="RegistrableStockDTO">
+        <!-- 멀티lot 배분(FIFO)용 - 매수일 이른 lot부터 순서대로 반환 -->
         SELECT
-        registrable_stock_id AS registrableStockId,
-        general_account_id AS generalAccountId,
-        foreign_product_id AS foreignProductId,
-        held_qty AS heldQty,
-        source_broker AS sourceBroker,
-        recorded_at AS recordedAt,
-        purchase_date AS purchaseDate,
-        purchase_price AS purchasePrice,
-        purchase_currency AS purchaseCurrency,
-        purchase_fx_rate AS purchaseFxRate
-        FROM registrable_stock
-        WHERE general_account_id = #{generalAccountId}
-        AND foreign_product_id = #{foreignProductId}
+        rs.registrable_stock_id AS registrableStockId,
+        rs.general_account_id AS generalAccountId,
+        ga.account_type AS accountType,
+        rs.foreign_product_id AS foreignProductId,
+        rs.held_qty AS heldQty,
+        rs.source_broker AS sourceBroker,
+        rs.recorded_at AS recordedAt,
+        rs.purchase_date AS purchaseDate,
+        rs.purchase_price AS purchasePrice,
+        rs.purchase_currency AS purchaseCurrency,
+        rs.purchase_fx_rate AS purchaseFxRate
+        FROM registrable_stock rs
+        JOIN general_account ga ON rs.general_account_id = ga.general_account_id
+        JOIN general_customer gc ON ga.general_customer_id = gc.general_customer_id
+        WHERE gc.ci_hash = #{ciHash}
+        AND ga.status = 'ACTIVE'
+        AND rs.foreign_product_id = #{foreignProductId}
+        ORDER BY rs.purchase_date ASC
     </select>
 
 </mapper>
