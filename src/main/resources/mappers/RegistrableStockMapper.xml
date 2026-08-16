@@ -8,6 +8,7 @@
         SELECT
         rs.registrable_stock_id AS registrableStockId,
         rs.general_account_id AS generalAccountId,
+        ga.account_type AS accountType,
         rs.foreign_product_id AS foreignProductId,
         (SELECT COALESCE(SUM(rs2.held_qty), 0)
         FROM registrable_stock rs2
@@ -37,6 +38,7 @@
         SELECT
         rs.registrable_stock_id AS registrableStockId,
         rs.general_account_id AS generalAccountId,
+        ga.account_type AS accountType,
         rs.foreign_product_id AS foreignProductId,
         rs.held_qty AS heldQty,
         rs.source_broker AS sourceBroker,

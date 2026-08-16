@@ -1,5 +1,6 @@
 package com.app.returns.domain.dto;
 
+import com.app.returns.domain.generalaccount.type.GeneralAccountType;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 public class RegistrableStockDTO {
     private Long registrableStockId;
     private Long generalAccountId;
+    private GeneralAccountType accountType;
     private Long foreignProductId;
     private BigDecimal heldQty;
     private String sourceBroker;
