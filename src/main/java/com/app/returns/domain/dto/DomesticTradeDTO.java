@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter @Setter @ToString @Builder
 public class DomesticTradeDTO {
     private Long tradeId;
-    private Long generalAccountId;
+    private Long generalCustomerId;
     private String tradeType;
     private String stockCode;
     private BigDecimal qty;

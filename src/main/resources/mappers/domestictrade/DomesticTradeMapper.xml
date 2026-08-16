@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.returns.domain.mapper.DomesticTradeMapper">
+
+    <select id="selectByCiHash" parameterType="DomesticTradeRequestDTO" resultType="DomesticTradeDTO">
+        SELECT
+        dt.trade_id AS tradeId,
+        dt.general_customer_id AS generalCustomerId,
+        dt.trade_type AS tradeType,
+        dt.stock_code AS stockCode,
+        dt.qty AS qty,
+        dt.price AS price,
+        dt.executed_at AS executedAt
+        FROM domestic_trade dt
+        JOIN general_customer gc ON gc.general_customer_id = dt.general_customer_id
+        WHERE gc.ci_hash = #{ciHash}
+        ORDER BY dt.executed_at ASC
+    </select>
+
+</mapper>
