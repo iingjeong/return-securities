@@ -31,7 +31,7 @@ class RegistrableStockServiceImplTest {
     @Test
     void findHeldQtyReturnsResponseWhenStockExists() {
         RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .generalAccountId(1L)
+                .ciHash("ci-hash-1")
                 .foreignProductId(1L)
                 .build();
 
@@ -51,6 +51,7 @@ class RegistrableStockServiceImplTest {
 
         RegistrableStockResponseDTO result = registrableStockService.findHeldQty(request);
 
+        assertThat(result.getGeneralAccountId()).isEqualTo(1L);
         assertThat(result.getHeldQty()).isEqualByComparingTo(BigDecimal.valueOf(100));
         assertThat(result.getPurchaseCurrency()).isEqualTo("USD");
     }
@@ -58,7 +59,7 @@ class RegistrableStockServiceImplTest {
     @Test
     void findHeldQtyThrowsNotFoundExceptionWhenStockDoesNotExist() {
         RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .generalAccountId(1L)
+                .ciHash("ci-hash-1")
                 .foreignProductId(1L)
                 .build();
 
