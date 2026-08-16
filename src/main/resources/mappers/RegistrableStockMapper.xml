@@ -30,4 +30,27 @@
         LIMIT 1
     </select>
 
+    <select id="findLotsByCiHashAndProduct"
+            parameterType="RegistrableStockRequestDTO"
+            resultType="RegistrableStockDTO">
+        <!-- 멀티lot 배분(FIFO)용 - 매수일 이른 lot부터 순서대로 반환 -->
+        SELECT
+        rs.registrable_stock_id AS registrableStockId,
+        rs.general_account_id AS generalAccountId,
+        rs.foreign_product_id AS foreignProductId,
+        rs.held_qty AS heldQty,
+        rs.source_broker AS sourceBroker,
+        rs.recorded_at AS recordedAt,
+        rs.purchase_date AS purchaseDate,
+        rs.purchase_price AS purchasePrice,
+        rs.purchase_currency AS purchaseCurrency,
+        rs.purchase_fx_rate AS purchaseFxRate
+        FROM registrable_stock rs
+        JOIN general_account ga ON rs.general_account_id = ga.general_account_id
+        JOIN general_customer gc ON ga.general_customer_id = gc.general_customer_id
+        WHERE gc.ci_hash = #{ciHash}
+        AND rs.foreign_product_id = #{foreignProductId}
+        ORDER BY rs.purchase_date ASC
+    </select>
+
 </mapper>

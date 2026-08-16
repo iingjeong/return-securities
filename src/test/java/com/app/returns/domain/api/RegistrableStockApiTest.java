@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -80,6 +81,50 @@ class RegistrableStockApiTest {
                 .andExpect(jsonPath("$.message").value("foreignProductId는 필수입니다."));
 
         verify(registrableStockService, never()).findHeldQty(any());
+    }
+
+    @Test
+    void getRegistrableStockLotsAcceptsValidRequest() throws Exception {
+        RegistrableStockResponseDTO lot1 = RegistrableStockResponseDTO.builder()
+                .generalAccountId(10L)
+                .heldQty(BigDecimal.valueOf(40))
+                .purchaseDate(LocalDateTime.now())
+                .purchasePrice(BigDecimal.valueOf(150.25))
+                .purchaseCurrency("USD")
+                .purchaseFxRate(BigDecimal.valueOf(1320.5))
+                .build();
+        RegistrableStockResponseDTO lot2 = RegistrableStockResponseDTO.builder()
+                .generalAccountId(20L)
+                .heldQty(BigDecimal.valueOf(60))
+                .purchaseDate(LocalDateTime.now())
+                .purchasePrice(BigDecimal.valueOf(180))
+                .purchaseCurrency("USD")
+                .purchaseFxRate(BigDecimal.valueOf(1330))
+                .build();
+        when(registrableStockService.findLots(any())).thenReturn(List.of(lot1, lot2));
+
+        mockMvc.perform(get("/api/registrable-stocks/lots")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("ciHash", "hash-1")
+                        .param("foreignProductId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("조회 성공"))
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].generalAccountId").value(10))
+                .andExpect(jsonPath("$.data[1].generalAccountId").value(20));
+
+        verify(registrableStockService).findLots(any());
+    }
+
+    @Test
+    void getRegistrableStockLotsRejectsMissingCiHash() throws Exception {
+        mockMvc.perform(get("/api/registrable-stocks/lots")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("foreignProductId", "1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("ciHash는 필수입니다."));
+
+        verify(registrableStockService, never()).findLots(any());
     }
 
     @Test

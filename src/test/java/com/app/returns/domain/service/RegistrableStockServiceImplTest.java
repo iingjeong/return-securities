@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,5 +69,57 @@ class RegistrableStockServiceImplTest {
         assertThatThrownBy(() -> registrableStockService.findHeldQty(request))
                 .isInstanceOf(RegistrableStockNotFoundException.class)
                 .hasMessage("등록가능 보유수량 조회 실패");
+    }
+
+    @Test
+    void findLotsReturnsAllLotsMappedToResponseDTOs() {
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("ci-hash-1")
+                .foreignProductId(1L)
+                .build();
+
+        RegistrableStockDTO lot1 = RegistrableStockDTO.builder()
+                .registrableStockId(1L)
+                .generalAccountId(10L)
+                .foreignProductId(1L)
+                .heldQty(BigDecimal.valueOf(40))
+                .purchaseDate(LocalDateTime.of(2026, 1, 5, 9, 0))
+                .purchasePrice(BigDecimal.valueOf(150.25))
+                .purchaseCurrency("USD")
+                .purchaseFxRate(BigDecimal.valueOf(1320.5))
+                .build();
+        RegistrableStockDTO lot2 = RegistrableStockDTO.builder()
+                .registrableStockId(2L)
+                .generalAccountId(20L)
+                .foreignProductId(1L)
+                .heldQty(BigDecimal.valueOf(60))
+                .purchaseDate(LocalDateTime.of(2026, 3, 10, 9, 0))
+                .purchasePrice(BigDecimal.valueOf(180))
+                .purchaseCurrency("USD")
+                .purchaseFxRate(BigDecimal.valueOf(1330))
+                .build();
+        when(registrableStockMapper.findLotsByCiHashAndProduct(request))
+                .thenReturn(List.of(lot1, lot2));
+
+        List<RegistrableStockResponseDTO> result = registrableStockService.findLots(request);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getGeneralAccountId()).isEqualTo(10L);
+        assertThat(result.get(0).getHeldQty()).isEqualByComparingTo(BigDecimal.valueOf(40));
+        assertThat(result.get(1).getGeneralAccountId()).isEqualTo(20L);
+        assertThat(result.get(1).getHeldQty()).isEqualByComparingTo(BigDecimal.valueOf(60));
+    }
+
+    @Test
+    void findLotsReturnsEmptyListWhenNoLotsExist() {
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("ci-hash-1")
+                .foreignProductId(1L)
+                .build();
+        when(registrableStockMapper.findLotsByCiHashAndProduct(request)).thenReturn(List.of());
+
+        List<RegistrableStockResponseDTO> result = registrableStockService.findLots(request);
+
+        assertThat(result).isEmpty();
     }
 }

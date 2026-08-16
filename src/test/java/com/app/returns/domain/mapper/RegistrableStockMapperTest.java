@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -181,6 +182,46 @@ class RegistrableStockMapperTest {
         assertThat(result).isPresent();
         assertThat(result.get().getGeneralAccountId()).isEqualTo(2L);
         assertThat(result.get().getPurchasePrice()).isEqualByComparingTo(BigDecimal.valueOf(150));
+    }
+
+    @Test
+    @DisplayName("lot 목록은 매수일이 이른 순서대로 반환한다")
+    void findLotsByCiHashAndProductReturnsLotsOrderedByPurchaseDateAscending() {
+        insertGeneralCustomer(1L, "hash-1");
+        insertGeneralAccount(1L, 1L);
+        insertGeneralAccount(2L, 1L);
+        insertRegistrableStock(
+                1L, 1L, BigDecimal.valueOf(60), LocalDateTime.of(2026, 3, 10, 9, 0),
+                BigDecimal.valueOf(180));
+        insertRegistrableStock(
+                2L, 1L, BigDecimal.valueOf(40), LocalDateTime.of(2026, 1, 5, 9, 0),
+                BigDecimal.valueOf(150));
+
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("hash-1")
+                .foreignProductId(1L)
+                .build();
+
+        List<RegistrableStockDTO> result = registrableStockMapper.findLotsByCiHashAndProduct(request);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getGeneralAccountId()).isEqualTo(2L);
+        assertThat(result.get(0).getHeldQty()).isEqualByComparingTo(BigDecimal.valueOf(40));
+        assertThat(result.get(1).getGeneralAccountId()).isEqualTo(1L);
+        assertThat(result.get(1).getHeldQty()).isEqualByComparingTo(BigDecimal.valueOf(60));
+    }
+
+    @Test
+    @DisplayName("일치하는 lot이 없으면 빈 목록을 반환한다")
+    void findLotsByCiHashAndProductReturnsEmptyListWhenNoMatch() {
+        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
+                .ciHash("hash-1")
+                .foreignProductId(1L)
+                .build();
+
+        List<RegistrableStockDTO> result = registrableStockMapper.findLotsByCiHashAndProduct(request);
+
+        assertThat(result).isEmpty();
     }
 
     private void resetSchema() throws SQLException {
