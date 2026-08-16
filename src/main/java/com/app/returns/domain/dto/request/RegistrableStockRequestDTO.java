@@ -8,8 +8,8 @@ import lombok.*;
 @Getter @Setter @ToString @Builder
 public class RegistrableStockRequestDTO {
 
-    @NotNull(message = "generalAccountId는 필수입니다.")
-    private Long generalAccountId;
+    @NotNull(message = "ciHash는 필수입니다.")
+    private String ciHash;
 
     @NotNull(message = "foreignProductId는 필수입니다.")
     private Long foreignProductId;

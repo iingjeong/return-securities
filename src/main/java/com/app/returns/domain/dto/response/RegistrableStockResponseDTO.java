@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter @Setter @ToString @Builder
 public class RegistrableStockResponseDTO {
 
+    private Long generalAccountId;
     private BigDecimal heldQty;
     private String sourceBroker;
     private LocalDateTime purchaseDate;
@@ -18,6 +19,7 @@ public class RegistrableStockResponseDTO {
     private BigDecimal purchaseFxRate;
 
     public RegistrableStockResponseDTO(RegistrableStockDTO dto) {
+        this.generalAccountId = dto.getGeneralAccountId();
         this.heldQty = dto.getHeldQty();
         this.sourceBroker = dto.getSourceBroker();
         this.purchaseDate = dto.getPurchaseDate();
