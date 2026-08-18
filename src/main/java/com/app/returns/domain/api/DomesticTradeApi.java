@@ -7,7 +7,8 @@ import com.app.returns.global.response.ApiResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,9 +21,9 @@ public class DomesticTradeApi {
 
     private final DomesticTradeService domesticTradeService;
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<ApiResponseDTO<List<DomesticTradeResponseDTO>>> getDomesticTrades(
-            @Valid DomesticTradeRequestDTO request) {
+            @Valid @RequestBody DomesticTradeRequestDTO request) {
         List<DomesticTradeResponseDTO> result = domesticTradeService.findByCiHash(request);
         return ResponseEntity.ok(ApiResponseDTO.of("조회 성공", result));
     }

@@ -66,8 +66,8 @@ class DomesticTradeMapperTest {
     }
 
     @Test
-    @DisplayName("ciHash로 조회하면 매매내역을 매매일 오름차순으로 반환한다")
-    void selectByCiHashReturnsTradesOrderedByExecutedAtAscending() {
+    @DisplayName("ciHash로 조회하면 매매내역을 매매일 최신순(내림차순)으로 반환한다")
+    void selectByCiHashReturnsTradesOrderedByExecutedAtDescending() {
         insertGeneralCustomer(1L, "hash-1");
         insertDomesticTrade(
                 1L, "BUY", "005930", BigDecimal.valueOf(10), BigDecimal.valueOf(70000),
@@ -81,9 +81,9 @@ class DomesticTradeMapperTest {
         List<DomesticTradeDTO> result = domesticTradeMapper.selectByCiHash(request);
 
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).getExecutedAt()).isEqualTo(LocalDateTime.of(2026, 3, 5, 9, 0));
-        assertThat(result.get(0).getTradeType()).isEqualTo("SELL");
-        assertThat(result.get(1).getExecutedAt()).isEqualTo(LocalDateTime.of(2026, 3, 10, 9, 0));
+        assertThat(result.get(0).getExecutedAt()).isEqualTo(LocalDateTime.of(2026, 3, 10, 9, 0));
+        assertThat(result.get(0).getTradeType()).isEqualTo("BUY");
+        assertThat(result.get(1).getExecutedAt()).isEqualTo(LocalDateTime.of(2026, 3, 5, 9, 0));
     }
 
     @Test
