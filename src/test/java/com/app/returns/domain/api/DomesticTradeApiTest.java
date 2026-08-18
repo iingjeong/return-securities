@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,9 +47,10 @@ class DomesticTradeApiTest {
                 .build();
         when(domesticTradeService.findByCiHash(any())).thenReturn(List.of(trade));
 
-        mockMvc.perform(get("/api/domestic-trades")
+        mockMvc.perform(post("/api/domestic-trades")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .param("ciHash", "hash-1"))
+                        .content("{\"ciHash\":\"hash-1\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("조회 성공"))
                 .andExpect(jsonPath("$.data.length()").value(1))
@@ -60,8 +61,22 @@ class DomesticTradeApiTest {
 
     @Test
     void getDomesticTradesRejectsMissingCiHash() throws Exception {
-        mockMvc.perform(get("/api/domestic-trades")
-                        .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/domestic-trades")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("ciHash는 필수입니다."));
+
+        verify(domesticTradeService, never()).findByCiHash(any());
+    }
+
+    @Test
+    void getDomesticTradesRejectsBlankCiHash() throws Exception {
+        mockMvc.perform(post("/api/domestic-trades")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{\"ciHash\":\"   \"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("ciHash는 필수입니다."));
 
@@ -72,9 +87,10 @@ class DomesticTradeApiTest {
     void getDomesticTradesReturnsEmptyListWhenNoTradesExist() throws Exception {
         when(domesticTradeService.findByCiHash(any())).thenReturn(List.of());
 
-        mockMvc.perform(get("/api/domestic-trades")
+        mockMvc.perform(post("/api/domestic-trades")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
-                        .param("ciHash", "hash-1"))
+                        .content("{\"ciHash\":\"hash-1\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isEmpty());
     }
