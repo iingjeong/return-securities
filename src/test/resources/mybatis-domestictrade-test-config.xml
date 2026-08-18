@@ -9,16 +9,16 @@
     </settings>
 
     <typeAliases>
-        <typeAlias alias="RegistrableStockDTO" type="com.app.returns.domain.dto.RegistrableStockDTO"/>
-        <typeAlias alias="RegistrableStockRequestDTO" type="com.app.returns.domain.dto.request.RegistrableStockRequestDTO"/>
+        <typeAlias alias="DomesticTradeDTO" type="com.app.returns.domain.dto.DomesticTradeDTO"/>
+        <typeAlias alias="DomesticTradeRequestDTO" type="com.app.returns.domain.dto.request.DomesticTradeRequestDTO"/>
     </typeAliases>
 
-    <environments default="registrablestock-mapper-test">
-        <environment id="registrablestock-mapper-test">
+    <environments default="domestictrade-mapper-test">
+        <environment id="domestictrade-mapper-test">
             <transactionManager type="JDBC"/>
             <dataSource type="POOLED">
                 <property name="driver" value="org.h2.Driver"/>
-                <property name="url" value="jdbc:h2:mem:registrablestock_mapper_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"/>
+                <property name="url" value="jdbc:h2:mem:domestictrade_mapper_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"/>
                 <property name="username" value="sa"/>
                 <property name="password" value=""/>
             </dataSource>
@@ -26,6 +26,6 @@
     </environments>
 
     <mappers>
-        <mapper resource="mappers/registrablestock/RegistrableStockMapper.xml"/>
+        <mapper resource="mappers/domestictrade/DomesticTradeMapper.xml"/>
     </mappers>
 </configuration>
