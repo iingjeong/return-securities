@@ -7,6 +7,8 @@ import com.app.returns.domain.generalaccount.exception.GeneralAccountNotFoundExc
 import com.app.returns.domain.member.exception.MemberException;
 import com.app.returns.domain.member.exception.MemberNotFoundException;
 import com.app.returns.global.response.ApiResponseDTO;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +42,15 @@ public class GlobalExceptionHandler {
     String message = e.getBindingResult().getFieldErrors().stream()
             .findFirst()
             .map(fieldError -> fieldError.getDefaultMessage())
+            .orElse("잘못된 요청입니다.");
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponseDTO.of(message));
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ApiResponseDTO<Void>> handleConstraintViolationException(ConstraintViolationException e) {
+    String message = e.getConstraintViolations().stream()
+            .findFirst()
+            .map(ConstraintViolation::getMessage)
             .orElse("잘못된 요청입니다.");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponseDTO.of(message));
   }
