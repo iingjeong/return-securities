@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,6 +32,13 @@ public class RegistrableStockApi {
     public ResponseEntity<ApiResponseDTO<List<RegistrableStockResponseDTO>>> getRegistrableStockLots(
             @Valid RegistrableStockRequestDTO request) {
         List<RegistrableStockResponseDTO> result = registrableStockService.findLots(request);
+        return ResponseEntity.ok(ApiResponseDTO.of("조회 성공", result));
+    }
+
+    @GetMapping("/customer-lots")
+    public ResponseEntity<ApiResponseDTO<List<RegistrableStockResponseDTO>>> getCustomerLots(
+            @RequestParam String ciHash) {
+        List<RegistrableStockResponseDTO> result = registrableStockService.findCustomerLots(ciHash);
         return ResponseEntity.ok(ApiResponseDTO.of("조회 성공", result));
     }
 }

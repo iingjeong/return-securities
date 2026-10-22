@@ -35,8 +35,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
-    // DB - MyBatis
+    // DB - 기존 MyBatis 유지, 신규 고객 적격 주식 조회는 JPA
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     // MariaDB
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

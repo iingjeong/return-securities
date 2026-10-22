@@ -10,4 +10,6 @@ public interface RegistrableStockService {
     RegistrableStockResponseDTO findHeldQty(RegistrableStockRequestDTO requestDTO);
 
     List<RegistrableStockResponseDTO> findLots(RegistrableStockRequestDTO requestDTO);
+
+    List<RegistrableStockResponseDTO> findCustomerLots(String ciHash);
 }
