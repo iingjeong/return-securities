@@ -27,6 +27,7 @@ public class RegistrableStockResponseDTO {
         this.registrableStockId = dto.getRegistrableStockId();
         this.foreignProductId = dto.getForeignProductId();
         this.generalAccountId = dto.getGeneralAccountId();
+        this.accountNo = dto.getAccountNo();
         this.accountType = dto.getAccountType();
         this.heldQty = dto.getHeldQty();
         this.sourceBroker = dto.getSourceBroker();

@@ -12,4 +12,6 @@ public interface RegistrableStockMapper {
     Optional<RegistrableStockDTO> findHeldQty(RegistrableStockRequestDTO requestDTO);
 
     List<RegistrableStockDTO> findLotsByCiHashAndProduct(RegistrableStockRequestDTO requestDTO);
+
+    List<RegistrableStockDTO> findCustomerLotsByCiHash(String ciHash);
 }

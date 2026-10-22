@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class RegistrableStockDTO {
     private Long registrableStockId;
     private Long generalAccountId;
+    private String accountNo;
     private GeneralAccountType accountType;
     private Long foreignProductId;
     private BigDecimal heldQty;
