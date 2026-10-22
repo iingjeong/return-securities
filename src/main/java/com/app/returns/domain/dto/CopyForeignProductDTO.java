@@ -5,7 +5,10 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter @ToString @Builder
+@Getter
+@Setter
+@ToString
+@Builder
 public class CopyForeignProductDTO {
     private Long foreignProductId;
     private String ticker;

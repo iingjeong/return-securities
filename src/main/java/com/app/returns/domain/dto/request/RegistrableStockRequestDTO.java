@@ -5,7 +5,10 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter @ToString @Builder
+@Getter
+@Setter
+@ToString
+@Builder
 public class RegistrableStockRequestDTO {
 
     @NotNull(message = "ciHash는 필수입니다.")

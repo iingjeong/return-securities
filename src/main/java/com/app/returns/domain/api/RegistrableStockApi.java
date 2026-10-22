@@ -5,14 +5,13 @@ import com.app.returns.domain.dto.response.RegistrableStockResponseDTO;
 import com.app.returns.domain.service.RegistrableStockService;
 import com.app.returns.global.response.ApiResponseDTO;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,8 +28,8 @@ public class RegistrableStockApi {
     }
 
     @GetMapping("/lots")
-    public ResponseEntity<ApiResponseDTO<List<RegistrableStockResponseDTO>>> getRegistrableStockLots(
-            @Valid RegistrableStockRequestDTO request) {
+    public ResponseEntity<ApiResponseDTO<List<RegistrableStockResponseDTO>>>
+            getRegistrableStockLots(@Valid RegistrableStockRequestDTO request) {
         List<RegistrableStockResponseDTO> result = registrableStockService.findLots(request);
         return ResponseEntity.ok(ApiResponseDTO.of("조회 성공", result));
     }
@@ -42,4 +41,3 @@ public class RegistrableStockApi {
         return ResponseEntity.ok(ApiResponseDTO.of("조회 성공", result));
     }
 }
-

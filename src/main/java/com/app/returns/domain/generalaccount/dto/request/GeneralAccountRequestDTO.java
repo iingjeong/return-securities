@@ -7,7 +7,8 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @Builder
 public class GeneralAccountRequestDTO {
@@ -18,4 +19,3 @@ public class GeneralAccountRequestDTO {
     @Positive(message = "generalAccountId는 양수여야 합니다.")
     private Long generalAccountId;
 }
-

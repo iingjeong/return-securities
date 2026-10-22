@@ -1,7 +1,15 @@
 package com.app.returns.domain.generalaccount.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.app.returns.domain.generalaccount.dto.GeneralAccountDTO;
 import com.app.returns.domain.generalaccount.type.GeneralStatus;
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Optional;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -14,15 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class GeneralAccountMapperTest {
 
     private static PooledDataSource dataSource;
@@ -33,12 +32,13 @@ class GeneralAccountMapperTest {
 
     @BeforeAll
     static void configureMyBatis() throws IOException {
-        try (Reader reader = Resources.getResourceAsReader("mybatis-generalaccount-test-config.xml")) {
+        try (Reader reader =
+                Resources.getResourceAsReader("mybatis-generalaccount-test-config.xml")) {
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         }
-        dataSource = (PooledDataSource) sqlSessionFactory.getConfiguration()
-                .getEnvironment()
-                .getDataSource();
+        dataSource =
+                (PooledDataSource)
+                        sqlSessionFactory.getConfiguration().getEnvironment().getDataSource();
     }
 
     @BeforeEach
@@ -104,18 +104,18 @@ class GeneralAccountMapperTest {
         insertCustomer(1L, "ci-owner");
         insertAccount(10L, 1L, "1000000001", "CLOSED");
 
-        GeneralAccountDTO result = generalAccountMapper
-                .findByCiHashAndGeneralAccountId("ci-owner", 10L)
-                .orElseThrow();
+        GeneralAccountDTO result =
+                generalAccountMapper.findByCiHashAndGeneralAccountId("ci-owner", 10L).orElseThrow();
 
         assertThat(result.getStatus()).isEqualTo(GeneralStatus.CLOSED);
     }
 
     private void resetSchema() throws SQLException {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+                Statement statement = connection.createStatement()) {
             statement.execute("DROP ALL OBJECTS");
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE general_customer (
                         general_customer_id BIGINT PRIMARY KEY,
                         ci_hash VARCHAR(64) NOT NULL UNIQUE,
@@ -123,7 +123,8 @@ class GeneralAccountMapperTest {
                         birth_date DATE NOT NULL
                     )
                     """);
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE general_account (
                         general_account_id BIGINT PRIMARY KEY,
                         general_customer_id BIGINT NOT NULL,
@@ -137,23 +138,27 @@ class GeneralAccountMapperTest {
     }
 
     private void insertCustomer(Long customerId, String ciHash) {
-        execute("""
+        execute(
+                """
                 INSERT INTO general_customer (general_customer_id, ci_hash, name, birth_date)
                 VALUES (%d, '%s', '테스트 고객', DATE '1990-01-01')
-                """.formatted(customerId, ciHash));
+                """
+                        .formatted(customerId, ciHash));
     }
 
     private void insertAccount(Long accountId, Long customerId, String accountNo, String status) {
-        execute("""
+        execute(
+                """
                 INSERT INTO general_account
                     (general_account_id, general_customer_id, account_no, account_type, status)
                 VALUES (%d, %d, '%s', 'BROKERAGE', '%s')
-                """.formatted(accountId, customerId, accountNo, status));
+                """
+                        .formatted(accountId, customerId, accountNo, status));
     }
 
     private void execute(String sql) {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+                Statement statement = connection.createStatement()) {
             statement.execute(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);

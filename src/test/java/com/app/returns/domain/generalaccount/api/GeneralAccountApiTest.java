@@ -1,5 +1,14 @@
 package com.app.returns.domain.generalaccount.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.app.returns.domain.generalaccount.dto.response.GeneralAccountResponseDTO;
 import com.app.returns.domain.generalaccount.exception.GeneralAccountException;
 import com.app.returns.domain.generalaccount.exception.GeneralAccountNotFoundException;
@@ -12,15 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 class GeneralAccountApiTest {
 
     private GeneralAccountService generalAccountService;
@@ -29,25 +29,28 @@ class GeneralAccountApiTest {
     @BeforeEach
     void setUp() {
         generalAccountService = mock(GeneralAccountService.class);
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(new GeneralAccountApi(generalAccountService))
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(new GeneralAccountApi(generalAccountService))
+                        .setControllerAdvice(new GlobalExceptionHandler())
+                        .build();
     }
 
     @Test
     void verifyGeneralAccountReturnsVerifiedAccount() throws Exception {
-        GeneralAccountResponseDTO response = GeneralAccountResponseDTO.builder()
-                .generalAccountId(10L)
-                .accountNo("1000000001")
-                .status(GeneralStatus.ACTIVE)
-                .build();
+        GeneralAccountResponseDTO response =
+                GeneralAccountResponseDTO.builder()
+                        .generalAccountId(10L)
+                        .accountNo("1000000001")
+                        .status(GeneralStatus.ACTIVE)
+                        .build();
         when(generalAccountService.verifyGeneralAccount(any())).thenReturn(response);
 
-        mockMvc.perform(post("/api/general-accounts/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("""
+        mockMvc.perform(
+                        post("/api/general-accounts/verify")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {"ciHash":"ci-owner","generalAccountId":10}
                                 """))
                 .andExpect(status().isOk())
@@ -61,10 +64,12 @@ class GeneralAccountApiTest {
 
     @Test
     void verifyGeneralAccountRejectsBlankCiHashBeforeCallingService() throws Exception {
-        mockMvc.perform(post("/api/general-accounts/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("""
+        mockMvc.perform(
+                        post("/api/general-accounts/verify")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {"ciHash":"   ","generalAccountId":10}
                                 """))
                 .andExpect(status().isBadRequest())
@@ -75,10 +80,12 @@ class GeneralAccountApiTest {
 
     @Test
     void verifyGeneralAccountRejectsMissingAccountIdBeforeCallingService() throws Exception {
-        mockMvc.perform(post("/api/general-accounts/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("""
+        mockMvc.perform(
+                        post("/api/general-accounts/verify")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {"ciHash":"ci-owner"}
                                 """))
                 .andExpect(status().isBadRequest())
@@ -89,10 +96,12 @@ class GeneralAccountApiTest {
 
     @Test
     void verifyGeneralAccountRejectsNonPositiveAccountIdBeforeCallingService() throws Exception {
-        mockMvc.perform(post("/api/general-accounts/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("""
+        mockMvc.perform(
+                        post("/api/general-accounts/verify")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {"ciHash":"ci-owner","generalAccountId":0}
                                 """))
                 .andExpect(status().isBadRequest())
@@ -106,10 +115,12 @@ class GeneralAccountApiTest {
         when(generalAccountService.verifyGeneralAccount(any()))
                 .thenThrow(new GeneralAccountNotFoundException("계좌를 찾을 수 없습니다."));
 
-        mockMvc.perform(post("/api/general-accounts/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("""
+        mockMvc.perform(
+                        post("/api/general-accounts/verify")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {"ciHash":"ci-owner","generalAccountId":999}
                                 """))
                 .andExpect(status().isNotFound())
@@ -121,10 +132,12 @@ class GeneralAccountApiTest {
         when(generalAccountService.verifyGeneralAccount(any()))
                 .thenThrow(new GeneralAccountException("해당 고객 소유의 계좌가 아닙니다."));
 
-        mockMvc.perform(post("/api/general-accounts/verify")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .content("""
+        mockMvc.perform(
+                        post("/api/general-accounts/verify")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                                 {"ciHash":"ci-owner","generalAccountId":10}
                                 """))
                 .andExpect(status().isBadRequest())
