@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,11 +16,13 @@ import com.app.returns.domain.generalaccount.exception.GeneralAccountNotFoundExc
 import com.app.returns.domain.generalaccount.service.GeneralAccountService;
 import com.app.returns.domain.generalaccount.type.GeneralStatus;
 import com.app.returns.global.exception.GlobalExceptionHandler;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 class GeneralAccountApiTest {
 
@@ -29,8 +32,13 @@ class GeneralAccountApiTest {
     @BeforeEach
     void setUp() {
         generalAccountService = mock(GeneralAccountService.class);
+        GeneralAccountApi controller = new GeneralAccountApi(generalAccountService);
+        MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
+        postProcessor.afterPropertiesSet();
+        Object proxied =
+                postProcessor.postProcessAfterInitialization(controller, "generalAccountApi");
         mockMvc =
-                MockMvcBuilders.standaloneSetup(new GeneralAccountApi(generalAccountService))
+                MockMvcBuilders.standaloneSetup(proxied)
                         .setControllerAdvice(new GlobalExceptionHandler())
                         .build();
     }
@@ -142,5 +150,38 @@ class GeneralAccountApiTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("해당 고객 소유의 계좌가 아닙니다."));
+    }
+
+    @Test
+    void findByCiHashReturnsAccountList() throws Exception {
+        GeneralAccountResponseDTO account =
+                GeneralAccountResponseDTO.builder()
+                        .generalAccountId(10L)
+                        .accountNo("1000000001")
+                        .status(GeneralStatus.ACTIVE)
+                        .build();
+        when(generalAccountService.findByCiHash("ci-owner")).thenReturn(List.of(account));
+
+        mockMvc.perform(
+                        get("/api/general-accounts")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("ciHash", "ci-owner"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("일반계좌 목록 조회 성공"))
+                .andExpect(jsonPath("$.data[0].generalAccountId").value(10))
+                .andExpect(jsonPath("$.data[0].accountNo").value("1000000001"));
+
+        verify(generalAccountService).findByCiHash("ci-owner");
+    }
+
+    @Test
+    void findByCiHashRejectsBlankCiHash() throws Exception {
+        mockMvc.perform(
+                        get("/api/general-accounts")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("ciHash", "   "))
+                .andExpect(status().isBadRequest());
+
+        verify(generalAccountService, never()).findByCiHash(any());
     }
 }

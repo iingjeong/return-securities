@@ -27,4 +27,17 @@
         WHERE general_account_id = #{generalAccountId}
     </select>
 
+    <select id="findAllActiveByCiHash" parameterType="String" resultType="GeneralAccountDTO">
+        SELECT
+            ga.general_account_id AS generalAccountId,
+            ga.general_customer_id AS generalCustomerId,
+            ga.account_no AS accountNo,
+            ga.account_type AS accountType,
+            ga.status AS status
+        FROM general_account ga
+        JOIN general_customer gc ON ga.general_customer_id = gc.general_customer_id
+        WHERE gc.ci_hash = #{ciHash}
+        AND ga.status = 'ACTIVE'
+    </select>
+
 </mapper>

@@ -7,6 +7,7 @@ import com.app.returns.domain.generalaccount.exception.GeneralAccountException;
 import com.app.returns.domain.generalaccount.exception.GeneralAccountNotFoundException;
 import com.app.returns.domain.generalaccount.mapper.GeneralAccountMapper;
 import com.app.returns.domain.generalaccount.type.GeneralStatus;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,5 +39,12 @@ public class GeneralAccountServiceImpl implements GeneralAccountService {
         }
 
         return new GeneralAccountResponseDTO(account);
+    }
+
+    @Override
+    public List<GeneralAccountResponseDTO> findByCiHash(String ciHash) {
+        return generalAccountMapper.findAllActiveByCiHash(ciHash).stream()
+                .map(GeneralAccountResponseDTO::new)
+                .toList();
     }
 }
