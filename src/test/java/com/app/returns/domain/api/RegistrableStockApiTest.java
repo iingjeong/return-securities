@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 class RegistrableStockApiTest {
 
@@ -30,8 +31,12 @@ class RegistrableStockApiTest {
     @BeforeEach
     void setUp() {
         registrableStockService = mock(RegistrableStockService.class);
+        RegistrableStockApi controller = new RegistrableStockApi(registrableStockService);
+        MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
+        postProcessor.afterPropertiesSet();
+        Object proxied = postProcessor.postProcessAfterInitialization(controller, "registrableStockApi");
         mockMvc =
-                MockMvcBuilders.standaloneSetup(new RegistrableStockApi(registrableStockService))
+                MockMvcBuilders.standaloneSetup(proxied)
                         .setControllerAdvice(new GlobalExceptionHandler())
                         .build();
     }
@@ -132,6 +137,31 @@ class RegistrableStockApiTest {
                 .andExpect(jsonPath("$.message").value("ciHash는 필수입니다."));
 
         verify(registrableStockService, never()).findLots(any());
+    }
+
+    @Test
+    void getCustomerLotsAcceptsValidCiHash() throws Exception {
+        when(registrableStockService.findCustomerLots("hash-1")).thenReturn(List.of());
+
+        mockMvc.perform(
+                        get("/api/registrable-stocks/customer-lots")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("ciHash", "hash-1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("조회 성공"));
+
+        verify(registrableStockService).findCustomerLots("hash-1");
+    }
+
+    @Test
+    void getCustomerLotsRejectsBlankCiHash() throws Exception {
+        mockMvc.perform(
+                        get("/api/registrable-stocks/customer-lots")
+                                .accept(MediaType.APPLICATION_JSON)
+                                .param("ciHash", "   "))
+                .andExpect(status().isBadRequest());
+
+        verify(registrableStockService, never()).findCustomerLots(any());
     }
 
     @Test

@@ -5,14 +5,17 @@ import com.app.returns.domain.dto.response.RegistrableStockResponseDTO;
 import com.app.returns.domain.service.RegistrableStockService;
 import com.app.returns.global.response.ApiResponseDTO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/registrable-stocks")
@@ -36,7 +39,7 @@ public class RegistrableStockApi {
 
     @GetMapping("/customer-lots")
     public ResponseEntity<ApiResponseDTO<List<RegistrableStockResponseDTO>>> getCustomerLots(
-            @RequestParam String ciHash) {
+            @RequestParam @NotBlank String ciHash) {
         List<RegistrableStockResponseDTO> result = registrableStockService.findCustomerLots(ciHash);
         return ResponseEntity.ok(ApiResponseDTO.of("조회 성공", result));
     }
