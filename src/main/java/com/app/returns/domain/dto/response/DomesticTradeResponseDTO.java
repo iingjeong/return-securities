@@ -1,10 +1,9 @@
 package com.app.returns.domain.dto.response;
 
 import com.app.returns.domain.dto.DomesticTradeDTO;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor

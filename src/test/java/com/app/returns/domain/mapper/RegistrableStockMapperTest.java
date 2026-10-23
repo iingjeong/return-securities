@@ -1,7 +1,18 @@
 package com.app.returns.domain.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.app.returns.domain.dto.RegistrableStockDTO;
 import com.app.returns.domain.dto.request.RegistrableStockRequestDTO;
+import java.io.IOException;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -14,18 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class RegistrableStockMapperTest {
 
     private static PooledDataSource dataSource;
@@ -36,13 +35,13 @@ class RegistrableStockMapperTest {
 
     @BeforeAll
     static void configureMyBatis() throws IOException {
-        try (Reader reader = Resources.getResourceAsReader("mybatis-registrablestock-test-config.xml")) {
+        try (Reader reader =
+                Resources.getResourceAsReader("mybatis-registrablestock-test-config.xml")) {
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         }
-        dataSource = (PooledDataSource) sqlSessionFactory
-                .getConfiguration()
-                .getEnvironment()
-                .getDataSource();
+        dataSource =
+                (PooledDataSource)
+                        sqlSessionFactory.getConfiguration().getEnvironment().getDataSource();
     }
 
     @BeforeEach
@@ -73,10 +72,8 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L);
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(100));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -91,10 +88,8 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L);
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(100));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(2L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(2L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -108,10 +103,8 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L);
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(100));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-2")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-2").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -127,10 +120,8 @@ class RegistrableStockMapperTest {
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(60));
         insertRegistrableStock(2L, 1L, BigDecimal.valueOf(40));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -148,10 +139,8 @@ class RegistrableStockMapperTest {
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(60));
         insertRegistrableStock(2L, 1L, BigDecimal.valueOf(40));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -166,16 +155,20 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L);
         insertGeneralAccount(2L, 1L);
         insertRegistrableStock(
-                1L, 1L, BigDecimal.valueOf(60), LocalDateTime.of(2026, 3, 10, 9, 0),
+                1L,
+                1L,
+                BigDecimal.valueOf(60),
+                LocalDateTime.of(2026, 3, 10, 9, 0),
                 BigDecimal.valueOf(180));
         insertRegistrableStock(
-                2L, 1L, BigDecimal.valueOf(40), LocalDateTime.of(2026, 1, 5, 9, 0),
+                2L,
+                1L,
+                BigDecimal.valueOf(40),
+                LocalDateTime.of(2026, 1, 5, 9, 0),
                 BigDecimal.valueOf(150));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -191,18 +184,23 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L);
         insertGeneralAccount(2L, 1L);
         insertRegistrableStock(
-                1L, 1L, BigDecimal.valueOf(60), LocalDateTime.of(2026, 3, 10, 9, 0),
+                1L,
+                1L,
+                BigDecimal.valueOf(60),
+                LocalDateTime.of(2026, 3, 10, 9, 0),
                 BigDecimal.valueOf(180));
         insertRegistrableStock(
-                2L, 1L, BigDecimal.valueOf(40), LocalDateTime.of(2026, 1, 5, 9, 0),
+                2L,
+                1L,
+                BigDecimal.valueOf(40),
+                LocalDateTime.of(2026, 1, 5, 9, 0),
                 BigDecimal.valueOf(150));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
-        List<RegistrableStockDTO> result = registrableStockMapper.findLotsByCiHashAndProduct(request);
+        List<RegistrableStockDTO> result =
+                registrableStockMapper.findLotsByCiHashAndProduct(request);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getGeneralAccountId()).isEqualTo(2L);
@@ -214,12 +212,11 @@ class RegistrableStockMapperTest {
     @Test
     @DisplayName("일치하는 lot이 없으면 빈 목록을 반환한다")
     void findLotsByCiHashAndProductReturnsEmptyListWhenNoMatch() {
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
-        List<RegistrableStockDTO> result = registrableStockMapper.findLotsByCiHashAndProduct(request);
+        List<RegistrableStockDTO> result =
+                registrableStockMapper.findLotsByCiHashAndProduct(request);
 
         assertThat(result).isEmpty();
     }
@@ -233,10 +230,8 @@ class RegistrableStockMapperTest {
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(60));
         insertRegistrableStock(2L, 1L, BigDecimal.valueOf(40));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -251,10 +246,8 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L, "CLOSED");
         insertRegistrableStock(1L, 1L, BigDecimal.valueOf(60));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
         Optional<RegistrableStockDTO> result = registrableStockMapper.findHeldQty(request);
 
@@ -268,18 +261,23 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(1L, 1L, "ACTIVE");
         insertGeneralAccount(2L, 1L, "CLOSED");
         insertRegistrableStock(
-                1L, 1L, BigDecimal.valueOf(60), LocalDateTime.of(2026, 3, 10, 9, 0),
+                1L,
+                1L,
+                BigDecimal.valueOf(60),
+                LocalDateTime.of(2026, 3, 10, 9, 0),
                 BigDecimal.valueOf(180));
         insertRegistrableStock(
-                2L, 1L, BigDecimal.valueOf(40), LocalDateTime.of(2026, 1, 5, 9, 0),
+                2L,
+                1L,
+                BigDecimal.valueOf(40),
+                LocalDateTime.of(2026, 1, 5, 9, 0),
                 BigDecimal.valueOf(150));
 
-        RegistrableStockRequestDTO request = RegistrableStockRequestDTO.builder()
-                .ciHash("hash-1")
-                .foreignProductId(1L)
-                .build();
+        RegistrableStockRequestDTO request =
+                RegistrableStockRequestDTO.builder().ciHash("hash-1").foreignProductId(1L).build();
 
-        List<RegistrableStockDTO> result = registrableStockMapper.findLotsByCiHashAndProduct(request);
+        List<RegistrableStockDTO> result =
+                registrableStockMapper.findLotsByCiHashAndProduct(request);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getGeneralAccountId()).isEqualTo(1L);
@@ -287,15 +285,17 @@ class RegistrableStockMapperTest {
 
     private void resetSchema() throws SQLException {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+                Statement statement = connection.createStatement()) {
             statement.execute("DROP ALL OBJECTS");
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE general_customer (
                         general_customer_id BIGINT PRIMARY KEY,
                         ci_hash VARCHAR(64) NOT NULL
                     )
                     """);
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE general_account (
                         general_account_id BIGINT PRIMARY KEY,
                         general_customer_id BIGINT NOT NULL,
@@ -304,7 +304,8 @@ class RegistrableStockMapperTest {
                         status VARCHAR(10) NOT NULL DEFAULT 'ACTIVE'
                     )
                     """);
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE registrable_stock (
                         registrable_stock_id BIGINT PRIMARY KEY AUTO_INCREMENT,
                         general_account_id BIGINT NOT NULL,
@@ -323,11 +324,13 @@ class RegistrableStockMapperTest {
 
     private void insertGeneralCustomer(Long generalCustomerId, String ciHash) {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute("""
+                Statement statement = connection.createStatement()) {
+            statement.execute(
+                    """
                     INSERT INTO general_customer (general_customer_id, ci_hash)
                     VALUES (%d, '%s')
-                    """.formatted(generalCustomerId, ciHash));
+                    """
+                            .formatted(generalCustomerId, ciHash));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -337,22 +340,30 @@ class RegistrableStockMapperTest {
         insertGeneralAccount(generalAccountId, generalCustomerId, "ACTIVE");
     }
 
-    private void insertGeneralAccount(Long generalAccountId, Long generalCustomerId, String status) {
+    private void insertGeneralAccount(
+            Long generalAccountId, Long generalCustomerId, String status) {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute("""
+                Statement statement = connection.createStatement()) {
+            statement.execute(
+                    """
                     INSERT INTO general_account
                     (general_account_id, general_customer_id, account_no, account_type, status)
                     VALUES (%d, %d, '%010d', 'BROKERAGE', '%s')
-                    """.formatted(generalAccountId, generalCustomerId, generalAccountId, status));
+                    """
+                            .formatted(
+                                    generalAccountId, generalCustomerId, generalAccountId, status));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void insertRegistrableStock(Long generalAccountId, Long foreignProductId, BigDecimal heldQty) {
+    private void insertRegistrableStock(
+            Long generalAccountId, Long foreignProductId, BigDecimal heldQty) {
         insertRegistrableStock(
-                generalAccountId, foreignProductId, heldQty, LocalDateTime.now(),
+                generalAccountId,
+                foreignProductId,
+                heldQty,
+                LocalDateTime.now(),
                 BigDecimal.valueOf(150.25));
     }
 
@@ -363,14 +374,19 @@ class RegistrableStockMapperTest {
             LocalDateTime purchaseDate,
             BigDecimal purchasePrice) {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute("""
+                Statement statement = connection.createStatement()) {
+            statement.execute(
+                    """
                     INSERT INTO registrable_stock
                     (general_account_id, foreign_product_id, held_qty, purchase_date, purchase_price, purchase_currency, purchase_fx_rate)
                     VALUES (%d, %d, %s, '%s', %s, 'USD', 1320.5)
-                    """.formatted(
-                    generalAccountId, foreignProductId, heldQty, purchaseDate, purchasePrice
-            ));
+                    """
+                            .formatted(
+                                    generalAccountId,
+                                    foreignProductId,
+                                    heldQty,
+                                    purchaseDate,
+                                    purchasePrice));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

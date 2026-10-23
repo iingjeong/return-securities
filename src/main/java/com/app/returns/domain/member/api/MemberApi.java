@@ -1,6 +1,5 @@
 package com.app.returns.domain.member.api;
 
-
 import com.app.returns.domain.member.dto.response.MemberResponseDTO;
 import com.app.returns.domain.member.service.MemberService;
 import com.app.returns.global.response.ApiResponseDTO;

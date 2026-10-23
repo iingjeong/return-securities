@@ -1,12 +1,14 @@
 package com.app.returns.domain.dto;
 
-import lombok.*;
-
 import java.time.LocalDate;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter @ToString @Builder
+@Getter
+@Setter
+@ToString
+@Builder
 public class GeneralCustomerDTO {
     private Long generalCustomerId;
     private String ciHash;

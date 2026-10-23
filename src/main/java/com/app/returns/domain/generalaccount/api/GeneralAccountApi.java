@@ -19,9 +19,9 @@ public class GeneralAccountApi {
     private final GeneralAccountService generalAccountService;
 
     @PostMapping("/verify")
-    public ResponseEntity<ApiResponseDTO<GeneralAccountResponseDTO>> verifyGeneralAccount (
-            @Valid @RequestBody GeneralAccountRequestDTO requestDTO){
+    public ResponseEntity<ApiResponseDTO<GeneralAccountResponseDTO>> verifyGeneralAccount(
+            @Valid @RequestBody GeneralAccountRequestDTO requestDTO) {
         GeneralAccountResponseDTO result = generalAccountService.verifyGeneralAccount(requestDTO);
-        return ResponseEntity.ok(ApiResponseDTO.of("일반계좌 검증 성공",result));
+        return ResponseEntity.ok(ApiResponseDTO.of("일반계좌 검증 성공", result));
     }
 }

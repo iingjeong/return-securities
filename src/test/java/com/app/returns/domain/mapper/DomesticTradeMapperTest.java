@@ -1,7 +1,17 @@
 package com.app.returns.domain.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.app.returns.domain.dto.DomesticTradeDTO;
 import com.app.returns.domain.dto.request.DomesticTradeRequestDTO;
+import java.io.IOException;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -14,17 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class DomesticTradeMapperTest {
 
     private static PooledDataSource dataSource;
@@ -35,13 +34,13 @@ class DomesticTradeMapperTest {
 
     @BeforeAll
     static void configureMyBatis() throws IOException {
-        try (Reader reader = Resources.getResourceAsReader("mybatis-domestictrade-test-config.xml")) {
+        try (Reader reader =
+                Resources.getResourceAsReader("mybatis-domestictrade-test-config.xml")) {
             sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
         }
-        dataSource = (PooledDataSource) sqlSessionFactory
-                .getConfiguration()
-                .getEnvironment()
-                .getDataSource();
+        dataSource =
+                (PooledDataSource)
+                        sqlSessionFactory.getConfiguration().getEnvironment().getDataSource();
     }
 
     @BeforeEach
@@ -70,13 +69,22 @@ class DomesticTradeMapperTest {
     void selectByCiHashReturnsTradesOrderedByExecutedAtDescending() {
         insertGeneralCustomer(1L, "hash-1");
         insertDomesticTrade(
-                1L, "BUY", "005930", BigDecimal.valueOf(10), BigDecimal.valueOf(70000),
+                1L,
+                "BUY",
+                "005930",
+                BigDecimal.valueOf(10),
+                BigDecimal.valueOf(70000),
                 LocalDateTime.of(2026, 3, 10, 9, 0));
         insertDomesticTrade(
-                1L, "SELL", "005930", BigDecimal.valueOf(5), BigDecimal.valueOf(72000),
+                1L,
+                "SELL",
+                "005930",
+                BigDecimal.valueOf(5),
+                BigDecimal.valueOf(72000),
                 LocalDateTime.of(2026, 3, 5, 9, 0));
 
-        DomesticTradeRequestDTO request = DomesticTradeRequestDTO.builder().ciHash("hash-1").build();
+        DomesticTradeRequestDTO request =
+                DomesticTradeRequestDTO.builder().ciHash("hash-1").build();
 
         List<DomesticTradeDTO> result = domesticTradeMapper.selectByCiHash(request);
 
@@ -92,13 +100,22 @@ class DomesticTradeMapperTest {
         insertGeneralCustomer(1L, "hash-1");
         insertGeneralCustomer(2L, "hash-2");
         insertDomesticTrade(
-                1L, "BUY", "005930", BigDecimal.valueOf(10), BigDecimal.valueOf(70000),
+                1L,
+                "BUY",
+                "005930",
+                BigDecimal.valueOf(10),
+                BigDecimal.valueOf(70000),
                 LocalDateTime.of(2026, 3, 5, 9, 0));
         insertDomesticTrade(
-                2L, "BUY", "000660", BigDecimal.valueOf(20), BigDecimal.valueOf(150000),
+                2L,
+                "BUY",
+                "000660",
+                BigDecimal.valueOf(20),
+                BigDecimal.valueOf(150000),
                 LocalDateTime.of(2026, 3, 6, 9, 0));
 
-        DomesticTradeRequestDTO request = DomesticTradeRequestDTO.builder().ciHash("hash-1").build();
+        DomesticTradeRequestDTO request =
+                DomesticTradeRequestDTO.builder().ciHash("hash-1").build();
 
         List<DomesticTradeDTO> result = domesticTradeMapper.selectByCiHash(request);
 
@@ -111,7 +128,8 @@ class DomesticTradeMapperTest {
     void selectByCiHashReturnsEmptyListWhenNoMatch() {
         insertGeneralCustomer(1L, "hash-1");
 
-        DomesticTradeRequestDTO request = DomesticTradeRequestDTO.builder().ciHash("hash-1").build();
+        DomesticTradeRequestDTO request =
+                DomesticTradeRequestDTO.builder().ciHash("hash-1").build();
 
         List<DomesticTradeDTO> result = domesticTradeMapper.selectByCiHash(request);
 
@@ -120,15 +138,17 @@ class DomesticTradeMapperTest {
 
     private void resetSchema() throws SQLException {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
+                Statement statement = connection.createStatement()) {
             statement.execute("DROP ALL OBJECTS");
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE general_customer (
                         general_customer_id BIGINT PRIMARY KEY,
                         ci_hash VARCHAR(64) NOT NULL
                     )
                     """);
-            statement.execute("""
+            statement.execute(
+                    """
                     CREATE TABLE domestic_trade (
                         trade_id BIGINT PRIMARY KEY AUTO_INCREMENT,
                         general_customer_id BIGINT NOT NULL,
@@ -144,11 +164,13 @@ class DomesticTradeMapperTest {
 
     private void insertGeneralCustomer(Long generalCustomerId, String ciHash) {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute("""
+                Statement statement = connection.createStatement()) {
+            statement.execute(
+                    """
                     INSERT INTO general_customer (general_customer_id, ci_hash)
                     VALUES (%d, '%s')
-                    """.formatted(generalCustomerId, ciHash));
+                    """
+                            .formatted(generalCustomerId, ciHash));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -162,14 +184,20 @@ class DomesticTradeMapperTest {
             BigDecimal price,
             LocalDateTime executedAt) {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute("""
+                Statement statement = connection.createStatement()) {
+            statement.execute(
+                    """
                     INSERT INTO domestic_trade
                     (general_customer_id, trade_type, stock_code, qty, price, executed_at)
                     VALUES (%d, '%s', '%s', %s, %s, '%s')
-                    """.formatted(
-                    generalCustomerId, tradeType, stockCode, qty, price, executedAt
-            ));
+                    """
+                            .formatted(
+                                    generalCustomerId,
+                                    tradeType,
+                                    stockCode,
+                                    qty,
+                                    price,
+                                    executedAt));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

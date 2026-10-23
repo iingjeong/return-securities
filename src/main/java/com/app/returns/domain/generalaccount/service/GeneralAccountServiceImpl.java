@@ -14,41 +14,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class GeneralAccountServiceImpl implements GeneralAccountService{
+public class GeneralAccountServiceImpl implements GeneralAccountService {
     private final GeneralAccountMapper generalAccountMapper;
 
     @Override
-    public GeneralAccountResponseDTO verifyGeneralAccount(GeneralAccountRequestDTO requestDTO){
-        if(!generalAccountMapper.existsCustomerByCiHash(requestDTO.getCiHash())){
-            throw new GeneralAccountNotFoundException(
-                    "고객을 찾을 수 없습니다."
-            );
-
+    public GeneralAccountResponseDTO verifyGeneralAccount(GeneralAccountRequestDTO requestDTO) {
+        if (!generalAccountMapper.existsCustomerByCiHash(requestDTO.getCiHash())) {
+            throw new GeneralAccountNotFoundException("고객을 찾을 수 없습니다.");
         }
 
-        if(!generalAccountMapper.existsGeneralAccountById(requestDTO.getGeneralAccountId())){
-            throw new GeneralAccountNotFoundException(
-                    "계좌를 찾을 수 없습니다."
-            );
+        if (!generalAccountMapper.existsGeneralAccountById(requestDTO.getGeneralAccountId())) {
+            throw new GeneralAccountNotFoundException("계좌를 찾을 수 없습니다.");
         }
 
-        GeneralAccountDTO account = generalAccountMapper.findByCiHashAndGeneralAccountId(
-                requestDTO.getCiHash(), requestDTO.getGeneralAccountId())
-                .orElseThrow(()->new GeneralAccountException(
-                        "해당 고객 소유의 계좌가 아닙니다."
-                ));
+        GeneralAccountDTO account =
+                generalAccountMapper
+                        .findByCiHashAndGeneralAccountId(
+                                requestDTO.getCiHash(), requestDTO.getGeneralAccountId())
+                        .orElseThrow(() -> new GeneralAccountException("해당 고객 소유의 계좌가 아닙니다."));
 
-        if(account.getStatus()== GeneralStatus.CLOSED){
-            throw new GeneralAccountException(
-                    "해지된 일반계좌입니다."
-            );
+        if (account.getStatus() == GeneralStatus.CLOSED) {
+            throw new GeneralAccountException("해지된 일반계좌입니다.");
         }
-
-
 
         return new GeneralAccountResponseDTO(account);
-
     }
-
-
 }

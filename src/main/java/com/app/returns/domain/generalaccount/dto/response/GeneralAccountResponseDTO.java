@@ -6,7 +6,8 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 @Builder
 public class GeneralAccountResponseDTO {
@@ -14,10 +15,9 @@ public class GeneralAccountResponseDTO {
     private String accountNo;
     private GeneralStatus status;
 
-    public GeneralAccountResponseDTO(GeneralAccountDTO dto){
+    public GeneralAccountResponseDTO(GeneralAccountDTO dto) {
         this.generalAccountId = dto.getGeneralAccountId();
         this.accountNo = dto.getAccountNo();
         this.status = dto.getStatus();
-
     }
 }

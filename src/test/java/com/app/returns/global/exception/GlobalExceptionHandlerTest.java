@@ -34,7 +34,8 @@ class GlobalExceptionHandlerTest {
         MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
         postProcessor.afterPropertiesSet();
         Object proxiedController =
-                postProcessor.postProcessAfterInitialization(new FixtureController(), "fixtureController");
+                postProcessor.postProcessAfterInitialization(
+                        new FixtureController(), "fixtureController");
 
         mockMvc =
                 MockMvcBuilders.standaloneSetup(proxiedController)
