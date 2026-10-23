@@ -34,7 +34,8 @@ class RegistrableStockApiTest {
         RegistrableStockApi controller = new RegistrableStockApi(registrableStockService);
         MethodValidationPostProcessor postProcessor = new MethodValidationPostProcessor();
         postProcessor.afterPropertiesSet();
-        Object proxied = postProcessor.postProcessAfterInitialization(controller, "registrableStockApi");
+        Object proxied =
+                postProcessor.postProcessAfterInitialization(controller, "registrableStockApi");
         mockMvc =
                 MockMvcBuilders.standaloneSetup(proxied)
                         .setControllerAdvice(new GlobalExceptionHandler())
