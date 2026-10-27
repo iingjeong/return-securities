@@ -3,11 +3,10 @@ package com.app.returns.domain.service;
 import com.app.returns.domain.dto.request.DomesticTradeRequestDTO;
 import com.app.returns.domain.dto.response.DomesticTradeResponseDTO;
 import com.app.returns.domain.mapper.DomesticTradeMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
